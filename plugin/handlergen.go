@@ -181,6 +181,17 @@ func (p *OrmPlugin) generateListHandler(message *generator.Descriptor) {
 	p.P(`if err != nil {`)
 	p.P(`return nil, err`)
 	p.P(`}`)
+
+	// add default ordering by primary key
+	ormable := p.getOrmable(typeName)
+	pkName, pk := p.findPrimaryKey(ormable)
+	column := pk.GetTag().GetColumn()
+	if len(column) > 0 && column != pkName {
+		p.P(`db = db.Order("`, column, `")`)
+	} else {
+		p.P(`db = db.Order(gorm.ToDBName("`, pkName, `"))`)
+	}
+
 	if opts := getMessageOptions(message); opts != nil && opts.GetMultiAccount() {
 		p.P("accountID, err := auth.GetAccountID(ctx, nil)")
 		p.P("if err != nil {")
