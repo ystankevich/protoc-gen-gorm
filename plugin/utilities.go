@@ -39,6 +39,7 @@ func getFieldOptions(field *descriptor.FieldDescriptorProto) *gorm.GormFieldOpti
 }
 
 func generateTransactionHandling(p *OrmPlugin) {
+	p.P(`var err error`)
 	p.P(`var txn *`, p.lftPkgName, `.Transaction`)
 	p.P(`txn, ok := `, p.lftPkgName, `.FromContext(ctx)`)
 	p.P(`if !ok {`)
