@@ -211,6 +211,9 @@ func (p *OrmPlugin) generateStrictUpdateHandler(message *generator.Descriptor) {
 	p.P(`if in == nil {`)
 	p.P(`return nil, fmt.Errorf("Nil argument to DefaultCascadedUpdate`, typeName, `")`)
 	p.P(`}`)
+	// get/create transaction
+	generateTransactionHandling(p)
+
 	p.P(`ormObj, err := in.ToORM(ctx)`)
 	p.P(`if err != nil {`)
 	p.P(`return nil, err`)

@@ -37,3 +37,37 @@ func getFieldOptions(field *descriptor.FieldDescriptorProto) *gorm.GormFieldOpti
 	}
 	return opts
 }
+
+func generateTransactionHandling(p *OrmPlugin) {
+	p.P(`var txn *`, p.lftPkgName, `.Transaction`)
+	p.P(`txn, ok := `, p.lftPkgName, `.FromContext(ctx)`)
+	p.P(`if !ok {`)
+
+	p.P(`defer func() {`)
+	p.P(`var terr error`)
+	p.P(`if err != nil {`)
+	p.P(`terr = txn.Rollback()`)
+	p.P(`} else {`)
+	p.P(`if terr = txn.Commit(); terr != nil {`)
+	p.P(`err = status.Error(codes.Internal, "+failed to commit transaction")`)
+	p.P(`}`)
+	p.P(`}`)
+
+	p.P(`if terr == nil {`)
+	p.P(`return`)
+	p.P(`}`)
+
+	p.P(`st := status.Convert(err)`)
+	p.P(`st, serr := st.WithDetails(errdetails.New(codes.Internal, "gorm", terr.Error()))`)
+	p.P(`// do not override error if failed to attach details`)
+	p.P(`if serr == nil {`)
+	p.P(`err = st.Err()`)
+	p.P(`}`)
+	p.P(`return`)
+	p.P(`}()`)
+
+	p.P(`txn = `, p.lftPkgName, `.NewTransaction(db)`)
+	p.P(`}`)
+	p.P(`db = txn.Begin()`)
+
+}
