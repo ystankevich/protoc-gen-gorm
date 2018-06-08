@@ -201,12 +201,6 @@ func (p *OrmPlugin) generateListHandler(message *generator.Descriptor) {
 
 func (p *OrmPlugin) generateStrictUpdateHandler(message *generator.Descriptor) {
 	typeName := p.TypeName(message)
-	p.P(`// DefaultStrictUpdate`, typeName, ` clears first level 1:many children and then executes a gorm update call`)
-	p.P(`func DefaultStrictUpdate`, typeName, `(ctx context.Context, in *`,
-		typeName, `, db *`, p.gormPkgName, `.DB) (*`, typeName, `, error) {`)
-	p.P(`if in == nil {`)
-	p.P(`return nil, fmt.Errorf("Nil argument to DefaultCascadedUpdate`, typeName, `")`)
-	p.P(`}`)
 
 	p.P(`func defaultStrictUpdate`, typeName, `(ctx context.Context, in *`,
 		typeName, `, db *`, p.gormPkgName, `.DB) (*`, typeName, `, error) {`)
@@ -228,6 +222,13 @@ func (p *OrmPlugin) generateStrictUpdateHandler(message *generator.Descriptor) {
 	p.P(`}`)
 	p.P(`return &pbResponse, nil`)
 	p.P(`}`)
+	p.P(`}`)
+
+	p.P(`// DefaultStrictUpdate`, typeName, ` clears first level 1:many children and then executes a gorm update call`)
+	p.P(`func DefaultStrictUpdate`, typeName, `(ctx context.Context, in *`,
+		typeName, `, db *`, p.gormPkgName, `.DB) (*`, typeName, `, error) {`)
+	p.P(`if in == nil {`)
+	p.P(`return nil, fmt.Errorf("Nil argument to DefaultCascadedUpdate`, typeName, `")`)
 	p.P(`}`)
 
 	generateTransactionHandling(p)
