@@ -202,27 +202,27 @@ func (p *OrmPlugin) generateListHandler(message *generator.Descriptor) {
 func (p *OrmPlugin) generateStrictUpdateHandler(message *generator.Descriptor) {
 	typeName := p.TypeName(message)
 
-	p.P(`func defaultStrictUpdate`, typeName, `(ctx context.Context, in *`,
-		typeName, `, db *`, p.gormPkgName, `.DB) (*`, typeName, `, error) {`)
-	p.P(`ormObj, err := in.ToORM(ctx)`)
-	p.P(`if err != nil {`)
-	p.P(`return nil, err`)
-	p.P(`}`)
-	p.removeChildAssociations(message)
-	if getMessageOptions(message).GetMultiAccount() {
-		p.P(`db = db.Where(&`, typeName, `ORM{AccountID: ormObj.AccountID})`)
-	}
-	p.setupOrderedHasMany(message)
-	p.P(`if err = db.Save(&ormObj).Error; err != nil {`)
-	p.P(`return nil, err`)
-	p.P(`}`)
-	p.P(`pbResponse, err := ormObj.ToPB(ctx)`)
-	p.P(`if err != nil {`)
-	p.P(`return nil, err`)
-	p.P(`}`)
-	p.P(`return &pbResponse, nil`)
-	p.P(`}`)
-	p.P(`}`)
+	// p.P(`func defaultStrictUpdate`, typeName, `(ctx context.Context, in *`,
+	// 	typeName, `, db *`, p.gormPkgName, `.DB) (*`, typeName, `, error) {`)
+	// p.P(`ormObj, err := in.ToORM(ctx)`)
+	// p.P(`if err != nil {`)
+	// p.P(`return nil, err`)
+	// p.P(`}`)
+	// p.removeChildAssociations(message)
+	// if getMessageOptions(message).GetMultiAccount() {
+	// 	p.P(`db = db.Where(&`, typeName, `ORM{AccountID: ormObj.AccountID})`)
+	// }
+
+	// p.P(`if err = db.Save(&ormObj).Error; err != nil {`)
+	// p.P(`return nil, err`)
+	// p.P(`}`)
+	// p.P(`pbResponse, err := ormObj.ToPB(ctx)`)
+	// p.P(`if err != nil {`)
+	// p.P(`return nil, err`)
+	// p.P(`}`)
+	// p.P(`return &pbResponse, nil`)
+	// p.P(`}`)
+	// p.P(`}`)
 
 	p.P(`// DefaultStrictUpdate`, typeName, ` clears first level 1:many children and then executes a gorm update call`)
 	p.P(`func DefaultStrictUpdate`, typeName, `(ctx context.Context, in *`,
